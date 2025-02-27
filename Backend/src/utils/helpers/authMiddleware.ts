@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-const authMiddleware = (userType: 'admin' | 'user') => (req: Request, res: Response, next: NextFunction) => {
+const authMiddleware = (userType: 'admin' | 'employee') => (req: Request, res: Response, next: NextFunction) => {
     try {
 
         const token = req.header('Authorization')?.replace('Bearer ', '');
