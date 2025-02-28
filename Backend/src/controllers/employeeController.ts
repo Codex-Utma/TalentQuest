@@ -33,7 +33,9 @@ const Login = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "El usuario no existe" });
         }
 
-        if(user.userType.name !== "employee") {
+        const userType: string = user.userType.name;
+
+        if(userType.toLowerCase() !== "employee") {
             return res.status(401).json({ message: "No tienes permiso para acceder a esta ruta" });
         }
 
