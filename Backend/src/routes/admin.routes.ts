@@ -1,10 +1,9 @@
 import { Router } from "express";
-import { Login } from "../controllers/employeeController";
 
 const router = Router();
 
-router.post("/login", (req, res) => {
-  Login(req, res);
+router.get("/", (req, res) => {
+  res.send({ message: "Hello World" });
 });
 
 export default router;
