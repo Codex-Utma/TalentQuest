@@ -18,8 +18,8 @@ model UserType {
   name String @db.VarChar(32)
   description String @db.VarChar(128)
   users User[]
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model User {
@@ -27,13 +27,13 @@ model User {
   name String @db.VarChar(32)
   lastname String @db.VarChar(32)
   email String @db.VarChar(32)
-  UserType UserType @relation(fields: [id_UserType], references: [id])
-  id_UserType Int
-  Course Course @relation(fields: [id_Course], references: [id])
-  id_Course Int
-  ClassAdvance ClassAdvance[]
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  userType UserType @relation(fields: [idUserType], references: [id])
+  idUserType Int
+  course Course @relation(fields: [idCourse], references: [id])
+  idCourse Int
+  classAdvance ClassAdvance[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Resource {
@@ -41,56 +41,56 @@ model Resource {
   name String @db.VarChar(32)
   description String @db.VarChar(128)
   link String @db.VarChar(255)
-  Class Class @relation(fields: [id_Class], references: [id])
-  id_Class Int
-  ResourceType ResourceType @relation(fields: [id_ResourceType], references: [id])
-  id_ResourceType Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  class Class @relation(fields: [idClass], references: [id])
+  idClass Int
+  resourceType ResourceType @relation(fields: [idResourceType], references: [id])
+  idResourceType Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Class {
   id Int @id @default(autoincrement())
   name String @db.VarChar(32)
   description String @db.VarChar(128)
-  Module Module @relation(fields: [id_Module], references: [id])
-  id_Module Int
+  module Module @relation(fields: [idModule], references: [id])
+  idModule Int
   resources Resource[]
-  ClassAdvance ClassAdvance[]
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  classAdvance ClassAdvance[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Module {
   id Int @id @default(autoincrement())
   name String @db.VarChar(32)
   description String @db.VarChar(128)
-  Course Course @relation(fields: [id_Course], references: [id])
-  id_Course Int
+  course Course @relation(fields: [idCourse], references: [id])
+  idCourse Int
   classes Class[]
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Course {
   id Int @id @default(autoincrement())
   name String @db.VarChar(32)
   description String @db.VarChar(128)
-  total_class Int
+  totalClasses Int
   modules Module[]
   users User[]
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ClassAdvance {
   id Int @id @default(autoincrement())
-  user User @relation(fields: [id_User], references: [id])
-  id_User Int
-  class Class @relation(fields: [id_Class], references: [id])
-  id_Class Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  user User @relation(fields: [idUser], references: [id])
+  idUser Int
+  class Class @relation(fields: [idClass], references: [id])
+  idClass Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ResourceType {
@@ -98,6 +98,6 @@ model ResourceType {
   name String @db.VarChar(32)
   description String @db.VarChar(128)
   resources Resource[]
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
