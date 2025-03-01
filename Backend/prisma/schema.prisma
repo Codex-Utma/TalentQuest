@@ -29,8 +29,8 @@ model User {
   email String @db.VarChar(32)
   userType UserType @relation(fields: [idUserType], references: [id])
   idUserType Int
-  course Course @relation(fields: [idCourse], references: [id])
-  idCourse Int
+  course Course? @relation(fields: [idCourse], references: [id])
+  idCourse Int?
   classAdvance ClassAdvance[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
