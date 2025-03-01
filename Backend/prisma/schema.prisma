@@ -12,3 +12,92 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model UserType {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(32)
+  description String @db.VarChar(128)
+  users User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(32)
+  lastname String @db.VarChar(32)
+  email String @db.VarChar(32)
+  userType UserType @relation(fields: [idUserType], references: [id])
+  idUserType Int
+  course Course? @relation(fields: [idCourse], references: [id])
+  idCourse Int?
+  classAdvance ClassAdvance[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Resource {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(32)
+  description String @db.VarChar(128)
+  link String @db.VarChar(255)
+  class Class @relation(fields: [idClass], references: [id])
+  idClass Int
+  resourceType ResourceType @relation(fields: [idResourceType], references: [id])
+  idResourceType Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Class {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(32)
+  description String @db.VarChar(128)
+  module Module @relation(fields: [idModule], references: [id])
+  idModule Int
+  resources Resource[]
+  classAdvance ClassAdvance[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Module {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(32)
+  description String @db.VarChar(128)
+  course Course @relation(fields: [idCourse], references: [id])
+  idCourse Int
+  classes Class[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(32)
+  description String @db.VarChar(128)
+  totalClasses Int
+  modules Module[]
+  users User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ClassAdvance {
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [idUser], references: [id])
+  idUser Int
+  class Class @relation(fields: [idClass], references: [id])
+  idClass Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ResourceType {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(32)
+  description String @db.VarChar(128)
+  resources Resource[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
