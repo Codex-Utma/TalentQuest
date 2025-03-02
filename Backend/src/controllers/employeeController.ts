@@ -93,7 +93,6 @@ const getCourseDetails = async (req: Request, res: Response) => {
 
 const getModules = async (req: Request, res: Response) => {
     try {
-        console.log(req.body.user);
         const courseId = Number(req.body.user.idCourse);
 
         if(isNaN(courseId)) {
@@ -121,8 +120,38 @@ const getModules = async (req: Request, res: Response) => {
     }
 }
 
+const getClasses = async (req: Request, res: Response) => {
+    try {
+        const moduleId = Number(req.params.moduleId);
+
+        if(isNaN(moduleId)) {
+            return returnResponse(res, 400, "El id del módulo debe ser un número");
+        }
+
+        const classes = await prisma.class.findMany({
+            where: {
+                idModule: moduleId
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+            }
+        });
+
+        if(classes.length === 0) {
+            return returnResponse(res, 404, "No se encontraron clases para el módulo");
+        }
+
+        return returnResponse(res, 200, "Clases encontradas", classes);
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     login,
     getCourseDetails,
-    getModules
+    getModules,
+    getClasses
 }
