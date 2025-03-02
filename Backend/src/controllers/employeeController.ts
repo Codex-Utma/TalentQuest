@@ -70,8 +70,33 @@ const getCourseDetails = async (req: Request, res: Response) => {
         const course = await prisma.course.findFirst({
             where: {
                 id: courseId
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                totalClasses: true
             }
         });
+
+        const advancedClasses = await prisma.classAdvance.count({
+            where: {
+                AND: [
+                    {
+                        idUser: user.id
+                    },
+                    {
+                        user: {
+                            idCourse: courseId
+                        }
+                    }
+                ]
+            }
+        });
+
+        if(advancedClasses === course?.totalClasses) {
+            return returnResponse(res, 200, "Curso completado", { completed: true });
+        }
 
         if(course === null) {
             return returnResponse(res, 404, "Curso no encontrado");
@@ -81,7 +106,8 @@ const getCourseDetails = async (req: Request, res: Response) => {
             id: course.id,
             name: course.name,
             description: course.description,
-            classes: course.totalClasses
+            classes: course.totalClasses,
+            percentage: `${(advancedClasses / course.totalClasses) * 100}%`
         };
 
         return returnResponse(res, 200, "Curso encontrado", courseData);
@@ -93,7 +119,6 @@ const getCourseDetails = async (req: Request, res: Response) => {
 
 const getModules = async (req: Request, res: Response) => {
     try {
-        console.log(req.body.user);
         const courseId = Number(req.body.user.idCourse);
 
         if(isNaN(courseId)) {
@@ -121,8 +146,81 @@ const getModules = async (req: Request, res: Response) => {
     }
 }
 
+const getClasses = async (req: Request, res: Response) => {
+    try {
+        const moduleId = Number(req.params.moduleId);
+
+        if(isNaN(moduleId)) {
+            return returnResponse(res, 400, "El id del módulo debe ser un número");
+        }
+
+        const classes = await prisma.class.findMany({
+            where: {
+                idModule: moduleId
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+            }
+        });
+
+        if(classes.length === 0) {
+            return returnResponse(res, 404, "No se encontraron clases para el módulo");
+        }
+
+        return returnResponse(res, 200, "Clases encontradas", classes);
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
+const addClassCompleted = async (req: Request, res: Response) => {
+    try {
+        const classId = Number(req.params.classId);
+
+        if(isNaN(classId)) {
+            return returnResponse(res, 400, "El id de la clase debe ser un número");
+        }
+
+        console.log(req.body.user);
+        const userId = Number(req.body.user.id);
+
+        const classCompleted = await prisma.classAdvance.findFirst({
+            where: {
+                AND: [
+                    {
+                        idUser: userId
+                    },
+                    {
+                        idClass: classId
+                    }
+                ]
+            }
+        });
+
+        if(classCompleted !== null) {
+            return returnResponse(res, 400, "La clase ya ha sido completada");
+        }
+
+        await prisma.classAdvance.create({
+            data: {
+                idUser: userId,
+                idClass: classId
+            }
+        });
+
+        return returnResponse(res, 200, "Clase completada");
+    } catch (error) {
+        console.log(error);
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     login,
     getCourseDetails,
-    getModules
+    getModules,
+    getClasses,
+    addClassCompleted
 }
