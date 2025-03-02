@@ -81,21 +81,6 @@ const getCourseDetails = async (req: Request, res: Response) => {
             }
         });
 
-        const advancedClasses = await prisma.classAdvance.count({
-            where: {
-                AND: [
-                    {
-                        idUser: user.id
-                    },
-                    {
-                        user: {
-                            idCourse: courseId
-                        }
-                    }
-                ]
-            }
-        });
-
         if(course === null) {
             return returnResponse(res, 404, "Curso no encontrado");
         }
@@ -119,7 +104,7 @@ const getCourseDetails = async (req: Request, res: Response) => {
 
         return returnResponse(res, 200, "Curso encontrado", courseData);
 
-    } catch (error) {
+    } catch {
         return returnResponse(res, 500, "Error interno del servidor");
     }
 }
@@ -148,7 +133,7 @@ const getModules = async (req: Request, res: Response) => {
         }
 
         return returnResponse(res, 200, "Módulos encontrados", modules);
-    } catch (error) {
+    } catch {
         return returnResponse(res, 500, "Error interno del servidor");
     }
 }
@@ -254,7 +239,7 @@ const addClassCompleted = async (req: Request, res: Response) => {
         })
 
         return returnResponse(res, 200, "Clase completada");
-    } catch (error) {
+    } catch {
         return returnResponse(res, 500, "Error interno del servidor");
     }
 }
@@ -346,7 +331,7 @@ const getResponse = async (req: Request, res: Response) => {
         const response = gptResponse.choices[0].message.content;
 
         return returnResponse(res, 200, "Respuesta encontrada", response);
-    } catch (error) {
+    } catch {
         return returnResponse(res, 500, "Error interno del servidor");
     }
 }

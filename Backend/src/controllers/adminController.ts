@@ -271,8 +271,7 @@ const register = async (req: Request, res: Response) => {
         });
 
         return returnResponse(res, 201, "Usuario registrado correctamente");
-    } catch (error) {
-        console.log(error);
+    } catch {
         return returnResponse(res, 500, "Error interno del servidor");
     }
 }
