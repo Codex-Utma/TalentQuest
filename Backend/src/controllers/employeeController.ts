@@ -70,8 +70,33 @@ const getCourseDetails = async (req: Request, res: Response) => {
         const course = await prisma.course.findFirst({
             where: {
                 id: courseId
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                totalClasses: true
             }
         });
+
+        const advancedClasses = await prisma.classAdvance.count({
+            where: {
+                AND: [
+                    {
+                        idUser: user.id
+                    },
+                    {
+                        user: {
+                            idCourse: courseId
+                        }
+                    }
+                ]
+            }
+        });
+
+        if(advancedClasses === course?.totalClasses) {
+            return returnResponse(res, 200, "Curso completado", { completed: true });
+        }
 
         if(course === null) {
             return returnResponse(res, 404, "Curso no encontrado");
@@ -81,7 +106,8 @@ const getCourseDetails = async (req: Request, res: Response) => {
             id: course.id,
             name: course.name,
             description: course.description,
-            classes: course.totalClasses
+            classes: course.totalClasses,
+            percentage: `${(advancedClasses / course.totalClasses) * 100}%`
         };
 
         return returnResponse(res, 200, "Curso encontrado", courseData);
