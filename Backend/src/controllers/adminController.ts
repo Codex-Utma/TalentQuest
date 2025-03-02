@@ -57,6 +57,38 @@ const login = async (req: Request, res: Response) => {
     }
 }
 
+const getStats = async (req: Request, res: Response) => {
+    try {
+        const users = await prisma.user.findMany({
+            where: {
+                userType: {
+                    name: "employee"
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                lastName: true,
+                course: {
+                    select: {
+                        name: true
+                    }
+                },
+                percentageCompleted: true
+            }
+        });
+
+        if (users.length === 0) {
+            return returnResponse(res, 404, "No se encontraron usuarios");
+        }
+
+        return returnResponse(res, 200, "Usuarios encontrados", users);
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
-    login
+    login,
+    getStats
 }
