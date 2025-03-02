@@ -183,7 +183,6 @@ const addClassCompleted = async (req: Request, res: Response) => {
             return returnResponse(res, 400, "El id de la clase debe ser un número");
         }
 
-        console.log(req.body.user);
         const userId = Number(req.body.user.id);
 
         const classCompleted = await prisma.classAdvance.findFirst({
@@ -212,7 +211,6 @@ const addClassCompleted = async (req: Request, res: Response) => {
 
         return returnResponse(res, 200, "Clase completada");
     } catch (error) {
-        console.log(error);
         return returnResponse(res, 500, "Error interno del servidor");
     }
 }
