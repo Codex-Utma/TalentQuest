@@ -91,7 +91,38 @@ const getCourseDetails = async (req: Request, res: Response) => {
     }
 }
 
+const getModules = async (req: Request, res: Response) => {
+    try {
+        console.log(req.body.user);
+        const courseId = Number(req.body.user.idCourse);
+
+        if(isNaN(courseId)) {
+            return returnResponse(res, 400, "El id del curso debe ser un número");
+        }
+
+        const modules = await prisma.module.findMany({
+            where: {
+                idCourse: courseId
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true
+            }
+        });
+
+        if(modules.length === 0) {
+            return returnResponse(res, 404, "No se encontraron módulos para el curso");
+        }
+
+        return returnResponse(res, 200, "Módulos encontrados", modules);
+    } catch (error) {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     login,
-    getCourseDetails
+    getCourseDetails,
+    getModules
 }

@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { getCourseDetails, login } from "../controllers/employeeController";
+import { getCourseDetails, getModules, login } from "../controllers/employeeController";
 
 import authMiddleware from "../utils/helpers/authMiddleware";
 
@@ -12,6 +12,10 @@ router.post("/login", (req, res) => {
 
 router.get("/course-details", authMiddleware('employee'), (req, res) => {
   getCourseDetails(req, res);
+});
+
+router.get("/modules", authMiddleware('employee'), (req, res) => {
+  getModules(req, res);
 });
 
 export default router;
