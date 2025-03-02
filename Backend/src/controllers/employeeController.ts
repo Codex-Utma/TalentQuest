@@ -96,20 +96,25 @@ const getCourseDetails = async (req: Request, res: Response) => {
             }
         });
 
-        if(advancedClasses === course?.totalClasses) {
-            return returnResponse(res, 200, "Curso completado", { completed: true });
-        }
-
         if(course === null) {
             return returnResponse(res, 404, "Curso no encontrado");
         }
+
+        const userPercentage = await prisma.user.findFirst({
+            where: {
+                id: user.id
+            },
+            select: {
+                percentageCompleted: true
+            }
+        });
 
         const courseData = {
             id: course.id,
             name: course.name,
             description: course.description,
             classes: course.totalClasses,
-            percentage: `${(advancedClasses / course.totalClasses) * 100}%`
+            percentage: userPercentage?.percentageCompleted
         };
 
         return returnResponse(res, 200, "Curso encontrado", courseData);
@@ -210,6 +215,43 @@ const addClassCompleted = async (req: Request, res: Response) => {
                 idClass: classId
             }
         });
+
+        const classesCompleted = await prisma.classAdvance.count({
+            where: {
+                AND: [
+                    {
+                        idUser: userId
+                    },
+                    {
+                        user: {
+                            idCourse: Number(req.body.user.idCourse)
+                        }
+                    }
+                ]
+            }
+        });
+
+        const totalClasses = await prisma.course.findFirst({
+            where: {
+                id: Number(req.body.user.idCourse)
+            },
+            select: {
+                totalClasses: true
+            }
+        });
+
+        if(totalClasses === null) {
+            return returnResponse(res, 404, "Curso no encontrado");
+        }
+
+        await prisma.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                percentageCompleted: (classesCompleted / totalClasses.totalClasses) * 100
+            }
+        })
 
         return returnResponse(res, 200, "Clase completada");
     } catch (error) {
