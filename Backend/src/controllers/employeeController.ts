@@ -8,7 +8,7 @@ import returnResponse from "../utils/auto/response";
 
 const prisma = new PrismaClient();
 
-const Login = async (req: Request, res: Response) => {
+const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
 
@@ -57,6 +57,41 @@ const Login = async (req: Request, res: Response) => {
     }
 }
 
+const getCourseDetails = async (req: Request, res: Response) => {
+    try {
+        const user = req.body.user;
+
+        const courseId = user.idCourse;
+
+        if(courseId === null) {
+            return returnResponse(res, 404, "El usuario no tiene un curso asignado");
+        }
+
+        const course = await prisma.course.findFirst({
+            where: {
+                id: courseId
+            }
+        });
+
+        if(course === null) {
+            return returnResponse(res, 404, "Curso no encontrado");
+        }
+
+        const courseData = {
+            id: course.id,
+            name: course.name,
+            description: course.description,
+            classes: course.totalClasses
+        };
+
+        return returnResponse(res, 200, "Curso encontrado", courseData);
+
+    } catch (error) {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
-    Login
+    login,
+    getCourseDetails
 }
