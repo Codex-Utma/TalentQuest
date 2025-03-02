@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-const authMiddleware = (userType: 'admin' | 'employee') => (req: Request, res: Response, next: NextFunction): void => {
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+const authMiddleware = (userType: 'admin' | 'employee') => async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
 
         const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -24,7 +28,32 @@ const authMiddleware = (userType: 'admin' | 'employee') => (req: Request, res: R
             return;
         }
 
-        req.body.tokenData = decoded;
+        const userId = Number(decoded.uid);
+
+        const user = await prisma.user.findFirst({
+            where: {
+                id: userId
+            },
+            select: {
+                userType: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
+        });
+
+        if(user === null) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        if(user.userType.name.toLowerCase() !== userType) {
+            res.status(401).json({ message: 'Your role is not allowed for this action' });
+            return;
+        }
+
+        req.body.user = user;
 
         next();
     } catch (error: any) {
