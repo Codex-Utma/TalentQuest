@@ -93,7 +93,7 @@ try {
     // seed();
     // seedModules();
     // console.log("Seed ejecutado correctamente");
-    seedClasses();
+    // seedClasses();
     console.log('No hay seed´s para ejecutar');
 } catch {
     throw new Error("Error al ejecutar el seed");
