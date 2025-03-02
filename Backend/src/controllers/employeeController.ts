@@ -175,9 +175,52 @@ const getClasses = async (req: Request, res: Response) => {
     }
 }
 
+const addClassCompleted = async (req: Request, res: Response) => {
+    try {
+        const classId = Number(req.params.classId);
+
+        if(isNaN(classId)) {
+            return returnResponse(res, 400, "El id de la clase debe ser un número");
+        }
+
+        console.log(req.body.user);
+        const userId = Number(req.body.user.id);
+
+        const classCompleted = await prisma.classAdvance.findFirst({
+            where: {
+                AND: [
+                    {
+                        idUser: userId
+                    },
+                    {
+                        idClass: classId
+                    }
+                ]
+            }
+        });
+
+        if(classCompleted !== null) {
+            return returnResponse(res, 400, "La clase ya ha sido completada");
+        }
+
+        await prisma.classAdvance.create({
+            data: {
+                idUser: userId,
+                idClass: classId
+            }
+        });
+
+        return returnResponse(res, 200, "Clase completada");
+    } catch (error) {
+        console.log(error);
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     login,
     getCourseDetails,
     getModules,
-    getClasses
+    getClasses,
+    addClassCompleted
 }
