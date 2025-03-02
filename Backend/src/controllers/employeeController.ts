@@ -1,15 +1,19 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 
-import prisma from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import generateJWT from "../utils/helpers/generateJWT";
 
-const Login = async (req: Request, res: Response) => {
+import returnResponse from "../utils/auto/response";
+
+const prisma = new PrismaClient();
+
+const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ message: "Todos los campos son obligatorios" });
+            return returnResponse(res, 400, "Todos los campos son obligatorios");
         }
 
         const user = await prisma.user.findFirst({
@@ -30,29 +34,95 @@ const Login = async (req: Request, res: Response) => {
         })
 
         if (user === null) {
-            return res.status(404).json({ message: "El usuario no existe" });
+            return returnResponse(res, 404, "El usuario no existe");
         }
 
         const userType: string = user.userType.name;
 
         if(userType.toLowerCase() !== "employee") {
-            return res.status(401).json({ message: "No tienes permiso para acceder a esta ruta" });
+            return returnResponse(res, 401, "No tienes permiso para acceder a esta ruta");
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordMatch) {
-            return res.status(401).json({ message: "Contraseña incorrecta" });
+            return returnResponse(res, 401, "Contraseña incorrecta");
         }
 
         const token = generateJWT(Number(user.id), user.name, user.lastName, 'employee');
 
-        return res.status(200).json({ message: "Usuario logueado correctamente", token });
+        return returnResponse(res, 200, "Usuario logueado correctamente", token);
     } catch {
-        return res.status(500).json({ message: "Error interno del servidor" });
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
+const getCourseDetails = async (req: Request, res: Response) => {
+    try {
+        const user = req.body.user;
+
+        const courseId = user.idCourse;
+
+        if(courseId === null) {
+            return returnResponse(res, 404, "El usuario no tiene un curso asignado");
+        }
+
+        const course = await prisma.course.findFirst({
+            where: {
+                id: courseId
+            }
+        });
+
+        if(course === null) {
+            return returnResponse(res, 404, "Curso no encontrado");
+        }
+
+        const courseData = {
+            id: course.id,
+            name: course.name,
+            description: course.description,
+            classes: course.totalClasses
+        };
+
+        return returnResponse(res, 200, "Curso encontrado", courseData);
+
+    } catch (error) {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
+const getModules = async (req: Request, res: Response) => {
+    try {
+        console.log(req.body.user);
+        const courseId = Number(req.body.user.idCourse);
+
+        if(isNaN(courseId)) {
+            return returnResponse(res, 400, "El id del curso debe ser un número");
+        }
+
+        const modules = await prisma.module.findMany({
+            where: {
+                idCourse: courseId
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true
+            }
+        });
+
+        if(modules.length === 0) {
+            return returnResponse(res, 404, "No se encontraron módulos para el curso");
+        }
+
+        return returnResponse(res, 200, "Módulos encontrados", modules);
+    } catch (error) {
+        return returnResponse(res, 500, "Error interno del servidor");
     }
 }
 
 export {
-    Login
+    login,
+    getCourseDetails,
+    getModules
 }

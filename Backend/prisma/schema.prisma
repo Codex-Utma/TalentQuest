@@ -25,8 +25,9 @@ model UserType {
 model User {
   id Int @id @default(autoincrement())
   name String @db.VarChar(32)
-  lastname String @db.VarChar(32)
+  lastName String @db.VarChar(32)
   email String @db.VarChar(32)
+  password String @db.VarChar(64)
   userType UserType @relation(fields: [idUserType], references: [id])
   idUserType Int
   course Course? @relation(fields: [idCourse], references: [id])
