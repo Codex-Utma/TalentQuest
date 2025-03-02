@@ -55,9 +55,29 @@ async function seed() {
     }
 }
 
+const seedModules = async () => {
+    try {
+        await prisma.module.createMany({
+            data: [
+                { name: "Introducción al curso", description: "Descripción del módulo de introducción.", idCourse: 1 },
+                { name: "Fundamentos básicos", description: "Descripción de los fundamentos básicos.", idCourse: 1 },
+                { name: "Conceptos intermedios", description: "Explicación de conceptos de nivel intermedio.", idCourse: 1 },
+                { name: "Aplicaciones prácticas", description: "Ejercicios y aplicaciones del curso.", idCourse: 1 },
+                { name: "Casos de estudio", description: "Análisis de casos reales.", idCourse: 1 },
+                { name: "Evaluación y pruebas", description: "Pruebas de conocimiento y evaluaciones.", idCourse: 1 },
+                { name: "Conclusión y cierre", description: "Resumen y cierre del curso.", idCourse: 1 }
+            ]
+        });
+    } catch {
+        throw new Error("Error al ejecutar el seed");
+    }
+}
+
 try {
-    seed();
-    console.log("Seed ejecutado correctamente");
+    // seed();
+    // seedModules();
+    // console.log("Seed ejecutado correctamente");
+    console.log('No hay seed´s para ejecutar');
 } catch {
     throw new Error("Error al ejecutar el seed");
 }
