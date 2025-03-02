@@ -35,6 +35,7 @@ const authMiddleware = (userType: 'admin' | 'employee') => async (req: Request, 
                 id: userId
             },
             select: {
+                idCourse: true,
                 userType: {
                     select: {
                         name: true
