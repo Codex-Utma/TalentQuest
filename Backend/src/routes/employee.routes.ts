@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { addClassCompleted, getClasses, getCourseDetails, getModules, login } from "../controllers/employeeController";
+import { addClassCompleted, getClasses, getCourseDetails, getModules, getResponse, login } from "../controllers/employeeController";
 
 import authMiddleware from "../utils/helpers/authMiddleware";
 
@@ -24,6 +24,10 @@ router.get("/classes/:moduleId", authMiddleware('employee'), (req, res) => {
 
 router.post("/class-completed/:classId", authMiddleware('employee'), (req, res) => {
   addClassCompleted(req, res);
+});
+
+router.get("/ia-question/:moduleId/:classId", authMiddleware('employee'), (req, res) => {
+  getResponse(req, res);
 });
 
 export default router;

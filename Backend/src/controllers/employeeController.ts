@@ -5,6 +5,8 @@ import { PrismaClient } from "@prisma/client";
 import generateJWT from "../utils/helpers/generateJWT";
 
 import returnResponse from "../utils/auto/response";
+import createGptPrompt from "../utils/auto/gptPrompt";
+import openai from "../utils/helpers/openaiSetup";
 
 const prisma = new PrismaClient();
 
@@ -215,10 +217,103 @@ const addClassCompleted = async (req: Request, res: Response) => {
     }
 }
 
+const getResponse = async (req: Request, res: Response) => {
+    try {
+
+        const courseId = Number(req.body.user.idCourse);
+        const moduleId = Number(req.params.moduleId);
+        const classId = Number(req.params.classId);
+
+        const question = req.body.question;
+
+        if(!question) {
+            return returnResponse(res, 400, "La pregunta es obligatoria");
+        }
+
+        if(isNaN(courseId) || isNaN(moduleId) || isNaN(classId)) {
+            return returnResponse(res, 400, "El id del curso, módulo y clase deben ser números");
+        }
+
+        const courseData = await prisma.course.findFirst({
+            where: {
+                id: courseId
+            },
+            select: {
+                name: true
+            }
+        });
+
+        if(courseData === null) {
+            return returnResponse(res, 404, "Curso no encontrado");
+        }
+
+        const moduleData = await prisma.module.findFirst({
+            where: {
+                AND: [
+                    {
+                        id: moduleId
+                    },
+                    {
+                        idCourse: courseId
+                    }
+                ]
+            },
+            select: {
+                name: true,
+            }
+        });
+
+        if(moduleData === null) {
+            return returnResponse(res, 404, "Módulo no encontrado");
+        }
+
+        const classData = await prisma.class.findFirst({
+            where: {
+                AND: [
+                    {
+                        id: classId
+                    },
+                    {
+                        idModule: moduleId
+                    }
+                ]
+            },
+            select: {
+                name: true
+            }
+        });
+
+        if(classData === null) {
+            return returnResponse(res, 404, "Clase no encontrada");
+        }
+
+        const prompt = createGptPrompt(courseData.name, moduleData.name, classData.name, question);
+
+        let gptResponse;
+
+        try {
+            gptResponse = await openai.chat.completions.create({
+                model: "text-moderation-latest",
+                messages: [{ role: "user", content: prompt }],
+                max_tokens: 500,
+            });
+        } catch (error: any) {
+            return returnResponse(res, error.status, error.message);
+        }
+
+        const response = gptResponse.choices[0].message.content;
+
+        return returnResponse(res, 200, "Respuesta encontrada", response);
+    } catch (error) {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     login,
     getCourseDetails,
     getModules,
     getClasses,
-    addClassCompleted
+    addClassCompleted,
+    getResponse
 }
