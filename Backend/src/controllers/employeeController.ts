@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
 import generateJWT from "../utils/helpers/generateJWT";
 
+import returnResponse from "../utils/auto/response";
+
 const prisma = new PrismaClient();
 
 const Login = async (req: Request, res: Response) => {
@@ -11,7 +13,7 @@ const Login = async (req: Request, res: Response) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ message: "Todos los campos son obligatorios" });
+            return returnResponse(res, 400, "Todos los campos son obligatorios");
         }
 
         const user = await prisma.user.findFirst({
@@ -32,26 +34,26 @@ const Login = async (req: Request, res: Response) => {
         })
 
         if (user === null) {
-            return res.status(404).json({ message: "El usuario no existe" });
+            return returnResponse(res, 404, "El usuario no existe");
         }
 
         const userType: string = user.userType.name;
 
         if(userType.toLowerCase() !== "employee") {
-            return res.status(401).json({ message: "No tienes permiso para acceder a esta ruta" });
+            return returnResponse(res, 401, "No tienes permiso para acceder a esta ruta");
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordMatch) {
-            return res.status(401).json({ message: "Contraseña incorrecta" });
+            return returnResponse(res, 401, "Contraseña incorrecta");
         }
 
         const token = generateJWT(Number(user.id), user.name, user.lastName, 'employee');
 
-        return res.status(200).json({ message: "Usuario logueado correctamente", token });
+        return returnResponse(res, 200, "Usuario logueado correctamente", token);
     } catch {
-        return res.status(500).json({ message: "Error interno del servidor" });
+        return returnResponse(res, 500, "Error interno del servidor");
     }
 }
 
