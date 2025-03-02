@@ -32,7 +32,7 @@ model User {
   idUserType Int
   course Course? @relation(fields: [idCourse], references: [id])
   idCourse Int?
-  percentageCompleted Int
+  percentageCompleted Int?
   classAdvance ClassAdvance[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
