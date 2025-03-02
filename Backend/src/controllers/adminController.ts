@@ -57,7 +57,7 @@ const login = async (req: Request, res: Response) => {
     }
 }
 
-const getStats = async (req: Request, res: Response) => {
+const getUsersStats = async (req: Request, res: Response) => {
     try {
         const users = await prisma.user.findMany({
             where: {
@@ -209,7 +209,7 @@ const createClass = async (req: Request, res: Response) => {
 
 export {
     login,
-    getStats,
+    getUsersStats,
     createCourse,
     createModule,
     createClass
