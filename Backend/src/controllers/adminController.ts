@@ -240,11 +240,49 @@ const getGeneralStats = async (req: Request, res: Response) => {
     }
 }
 
+const register = async (req: Request, res: Response) => {
+    try {
+        const { name, lastName, email, password, courseId } = req.body;
+
+        if (!name || !lastName || !email || !password || !courseId) {
+            return returnResponse(res, 400, "Todos los campos son obligatorios");
+        }
+
+        const course = await prisma.course.findFirst({
+            where: {
+                id: courseId
+            }
+        });
+
+        if (course === null) {
+            return returnResponse(res, 404, "El curso no existe");
+        }
+
+         await prisma.user.create({
+            data: {
+                name,
+                lastName,
+                email,
+                password: await bcrypt.hash(password, Number(process.env.BCRYPT_SALT) || 10),
+                idCourse: courseId,
+                idUserType: 2,
+                percentageCompleted: 0
+            }
+        });
+
+        return returnResponse(res, 201, "Usuario registrado correctamente");
+    } catch (error) {
+        console.log(error);
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     login,
     getUsersStats,
     createCourse,
     createModule,
     createClass,
-    getGeneralStats
+    getGeneralStats,
+    register
 }
