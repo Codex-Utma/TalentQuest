@@ -207,10 +207,44 @@ const createClass = async (req: Request, res: Response) => {
     }
 }
 
+const getGeneralStats = async (req: Request, res: Response) => {
+    try {
+        const totalCourses = await prisma.course.count();
+        const totalUsers = await prisma.user.count({
+            where: {
+                userType: {
+                    name: "employee"
+                }
+            }
+        });
+
+        const finishedCourses = await prisma.user.count({
+            where: {
+                userType: {
+                    name: "employee"
+                },
+                percentageCompleted: 100
+            }
+        });
+
+        const finalizationPercentage = (finishedCourses / totalUsers) * 100;
+
+        return returnResponse(res, 200, "Estadísticas generales", {
+            totalCourses,
+            totalUsers,
+            finishedCourses,
+            finalizationPercentage
+        });
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     login,
     getUsersStats,
     createCourse,
     createModule,
-    createClass
+    createClass,
+    getGeneralStats
 }
