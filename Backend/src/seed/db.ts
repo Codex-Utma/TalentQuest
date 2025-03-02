@@ -73,10 +73,27 @@ const seedModules = async () => {
     }
 }
 
+const seedClasses = async () => {
+    try {
+        await prisma.class.createMany({
+            data: [
+                { name: "Clase 1", description: "Descripción de la clase 1.", idModule: 1 },
+                { name: "Clase 2", description: "Descripción de la clase 2.", idModule: 1 },
+                { name: "Clase 3", description: "Descripción de la clase 3.", idModule: 1 },
+                { name: "Clase 4", description: "Descripción de la clase 4.", idModule: 1 },
+                { name: "Clase 5", description: "Descripción de la clase 5.", idModule: 1 }
+            ]
+        });
+    } catch {
+        throw new Error("Error al ejecutar el seed");
+    }
+}
+
 try {
     // seed();
     // seedModules();
     // console.log("Seed ejecutado correctamente");
+    seedClasses();
     console.log('No hay seed´s para ejecutar');
 } catch {
     throw new Error("Error al ejecutar el seed");
