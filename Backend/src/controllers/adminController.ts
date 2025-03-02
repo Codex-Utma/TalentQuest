@@ -88,7 +88,129 @@ const getStats = async (req: Request, res: Response) => {
     }
 }
 
+const createCourse = async (req: Request, res: Response) => {
+    try {
+        const { name, description } = req.body;
+
+        if (!name || !description) {
+            return returnResponse(res, 400, "Todos los campos son obligatorios");
+        }
+
+        const course = await prisma.course.create({
+            data: {
+                name,
+                description,
+                totalClasses: 0
+            }
+        });
+
+        return returnResponse(res, 201, "Curso creado correctamente", course);
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
+const createModule = async (req: Request, res: Response) => {
+    try {
+        const courseId = Number(req.params.courseId);
+
+        if (!courseId) {
+            return returnResponse(res, 400, "El id del curso es obligatorio");
+        }
+
+        const { name, description } = req.body;
+
+        if (!name || !description) {
+            return returnResponse(res, 400, "Todos los campos son obligatorios");
+        }
+
+        const course = await prisma.course.findFirst({
+            where: {
+                id: courseId
+            }
+        });
+
+        if (course === null) {
+            return returnResponse(res, 404, "El curso no existe");
+        }
+
+        const module = await prisma.module.create({
+            data: {
+                name,
+                description,
+                idCourse: courseId
+            }
+        });
+
+        return returnResponse(res, 201, "Módulo creado correctamente", module);
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
+const createClass = async (req: Request, res: Response) => {
+    try {
+        const moduleId = Number(req.params.moduleId);
+
+        if (!moduleId) {
+            return returnResponse(res, 400, "El id del módulo es obligatorio");
+        }
+
+        const { name, description } = req.body;
+
+        if (!name || !description) {
+            return returnResponse(res, 400, "Todos los campos son obligatorios");
+        }
+
+        const module = await prisma.module.findFirst({
+            where: {
+                id: moduleId
+            }
+        });
+
+        if (module === null) {
+            return returnResponse(res, 404, "El módulo no existe");
+        }
+
+        const course = await prisma.course.findFirst({
+            where: {
+                id: module.idCourse
+            }
+        });
+
+        if (course === null) {
+            return returnResponse(res, 404, "El curso no existe");
+        }
+
+        const newClass = await prisma.class.create({
+            data: {
+                name,
+                description,
+                idModule: moduleId
+            }
+        });
+
+        await prisma.course.update({
+            where: {
+                id: course.id
+            },
+            data: {
+                totalClasses: {
+                    increment: 1
+                }
+            }
+        });
+
+        return returnResponse(res, 201, "Clase creada correctamente", newClass);
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     login,
-    getStats
+    getStats,
+    createCourse,
+    createModule,
+    createClass
 }
