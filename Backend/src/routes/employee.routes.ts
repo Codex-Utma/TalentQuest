@@ -1,14 +1,10 @@
 import { Router } from "express";
 
-import { addClassCompleted, getClasses, getCourseDetails, getModules, getResponse, login } from "../controllers/employeeController";
+import { addClassCompleted, getClasses, getCourseDetails, getModules, getResponse } from "../controllers/employeeController";
 
 import authMiddleware from "../utils/helpers/authMiddleware";
 
 const router = Router();
-
-router.post("/login", (req, res) => {
-  login(req, res);
-});
 
 router.get("/course-details", authMiddleware('employee'), (req, res) => {
   getCourseDetails(req, res);

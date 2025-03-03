@@ -1,12 +1,8 @@
 import { Router } from "express";
-import { createClass, createCourse, createModule, getCourses, getGeneralStats, getUsersStats, login, register } from "../controllers/adminController";
+import { createClass, createCourse, createModule, getCourses, getGeneralStats, getUsersStats, register } from "../controllers/adminController";
 import authMiddleware from "../utils/helpers/authMiddleware";
 
 const router = Router();
-
-router.post("/login", (req, res) => {
-  login(req, res);
-});
 
 router.get('/general-stats', authMiddleware('admin'), (req, res) => {
   getGeneralStats(req, res);
