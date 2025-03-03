@@ -6,15 +6,24 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 
 import App from './App.tsx'
-import Prueba from './pages/prueba.tsx'
+import Prueba from './pages/prueba.tsx' 
+
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<App />} />
         <Route path='/prueba' element={<Prueba />} />
       </Routes>
+
+
+
+
     </BrowserRouter>
+
+
+    
   </StrictMode>,
 )
