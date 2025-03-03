@@ -14,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
 
         <Route index element={<App />} />
+        <Route path="/login" element={<Prueba />} />
 
         <Route path="/admin" element={<AdminLayout />} >
           <Route index element={<App />} />
