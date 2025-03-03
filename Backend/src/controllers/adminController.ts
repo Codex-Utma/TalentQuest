@@ -276,6 +276,38 @@ const register = async (req: Request, res: Response) => {
     }
 }
 
+const getCourses = async (req: Request, res: Response) => {
+    try {
+        console.log(req.query);
+        const courseName = req.query.courseName as string;
+
+        if (!courseName) {
+            return returnResponse(res, 400, "El nombre del curso es obligatorio");
+        }
+
+        const courses = await prisma.course.findMany({
+            where: {
+                name: {
+                    contains: courseName
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true
+            }
+        });
+
+        if (courses.length === 0) {
+            return returnResponse(res, 404, "No se encontraron cursos");
+        }
+
+        return returnResponse(res, 200, "Cursos encontrados", courses);
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     login,
     getUsersStats,
@@ -283,5 +315,6 @@ export {
     createModule,
     createClass,
     getGeneralStats,
-    register
+    register,
+    getCourses
 }
