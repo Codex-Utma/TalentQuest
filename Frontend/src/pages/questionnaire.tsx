@@ -123,7 +123,7 @@ const Questionnaire: React.FC = () => {
     };
 
     return (
-        <div className="items-center justify-center min-h-screen bg-gray-100 py-6 sm:py-12">
+        
         <div className="bg-gradient-to-b from-blue-500 to-blue-700 min-h-screen flex flex-col items-center justify-center p-6 text-white">
             {/* Navbar */}
             <nav className="bg-blue-800 w-full py-4 shadow-lg flex justify-center items-center">
@@ -160,7 +160,7 @@ const Questionnaire: React.FC = () => {
                 )}
             </div>
         </div>
-        </div>
+    
     );
 };
 
