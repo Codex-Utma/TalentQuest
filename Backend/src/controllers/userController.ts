@@ -48,8 +48,7 @@ const login = async (req: Request, res: Response) => {
         const token = generateJWT(Number(user.id), user.name, user.lastName, userType);
 
         return returnResponse(res, 200, "Usuario logueado correctamente", token);
-    } catch (error) {
-        console.log(error);
+    } catch {
         return returnResponse(res, 500, "Error interno del servidor");
     }
 }

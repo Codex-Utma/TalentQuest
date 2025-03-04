@@ -229,7 +229,6 @@ const register = async (req: Request, res: Response) => {
 
 const getCourses = async (req: Request, res: Response) => {
     try {
-        console.log(req.query);
         const courseName = req.query.courseName as string;
 
         if (!courseName) {
