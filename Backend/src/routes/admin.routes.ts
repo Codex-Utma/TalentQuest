@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addResource, createClass, createCourse, createModule, getClasses, getCourses, getGeneralStats, getModules, getUsersStats, register } from "../controllers/adminController";
+import { addResource, addVideo, createClass, createCourse, createModule, getClasses, getCourses, getGeneralStats, getModules, getUsersStats, register } from "../controllers/adminController";
 import authMiddleware from "../utils/helpers/authMiddleware";
 
 const router = Router();
@@ -42,6 +42,10 @@ router.get("/classes/:moduleId", authMiddleware('admin'), (req, res) => {
 
 router.post("/add-resource/:courseId/:moduleId/:classId", authMiddleware('admin'), (req, res) => {
   addResource(req, res);
+});
+
+router.post("/add-video/:classId", authMiddleware('admin'), (req, res) => {
+  addVideo(req, res);
 });
 
 export default router;

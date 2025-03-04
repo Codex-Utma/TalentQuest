@@ -456,6 +456,62 @@ const addResource = async (req: Request, res: Response) => {
     }
 }
 
+const addVideo = async (req: Request, res: Response) => {
+    try {
+        const { videoLink, description } = req.body;
+
+        if (!videoLink || !description) {
+            return returnResponse(res, 400, "El link del video y la descripción son obligatorios");
+        }
+
+        const { classId } = req.params;
+
+        if (!classId) {
+            return returnResponse(res, 400, "El id de la clase es obligatorio");
+        }
+
+        const classExist = await prisma.class.findFirst({
+            where: {
+                id: Number(classId)
+            },
+            select: {
+                id: true
+            }
+        });
+
+        if (!classExist) {
+            return returnResponse(res, 404, "La clase no existe");
+        }
+
+        const videoType = await prisma.resourceType.findFirst({
+            where: {
+                description: "mp4"
+            },
+            select: {
+                id: true
+            }
+        });
+
+        if (videoType === null) {
+            return returnResponse(res, 404, "Tipo de archivo no permitido");
+        }
+
+        await prisma.resource.create({
+            data: {
+                name: "Video",
+                link: videoLink,
+                idClass: Number(classId),
+                idResourceType: videoType.id,
+                description: description
+            }
+        });
+
+        return returnResponse(res, 200, "Video agregado correctamente");
+    } catch {
+        returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     getUsersStats,
     createCourse,
@@ -466,5 +522,6 @@ export {
     getCourses,
     getModules,
     getClasses,
-    addResource
+    addResource,
+    addVideo
 }
