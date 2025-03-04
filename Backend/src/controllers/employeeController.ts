@@ -374,11 +374,48 @@ const getResource = async (req: Request, res: Response) => {
     }
 }
 
+const getVideo = async (req: Request, res: Response) => {
+    try {
+        const classId = Number(req.params.classId);
+
+        if(isNaN(classId)) {
+            return returnResponse(res, 400, "El id de la clase debe ser un número");
+        }
+
+        const video = await prisma.resource.findFirst({
+            where: {
+                AND: [
+                    {
+                        idClass: classId
+                    },
+                    {
+                        resourceType: {
+                            description: "mp4"
+                        }
+                    }
+                ]
+            },
+            select: {
+                link: true
+            }
+        });
+
+        if(video === null) {
+            return returnResponse(res, 404, "Video no encontrado");
+        }
+
+        return returnResponse(res, 200, "Video encontrado", video.link);
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     getCourseDetails,
     getModules,
     getClasses,
     addClassCompleted,
     getResponse,
-    getResource
+    getResource,
+    getVideo
 }
