@@ -6,6 +6,9 @@ import returnResponse from "../utils/auto/response";
 import createGptPrompt from "../utils/auto/gptPrompt";
 import openai from "../utils/helpers/openaiSetup";
 
+import path from "path";
+import fs from "fs";
+
 const prisma = new PrismaClient();
 
 const getCourseDetails = async (req: Request, res: Response) => {
@@ -333,10 +336,49 @@ const getResponse = async (req: Request, res: Response) => {
     }
 }
 
+const getResource = async (req: Request, res: Response) => {
+    try {
+        const classId = Number(req.params.classId);
+
+        if(isNaN(classId)) {
+            return returnResponse(res, 400, "El id de la clase debe ser un número");
+        }
+
+        const resourceExists = await prisma.resource.findFirst({
+            where: {
+                idClass: classId
+            },
+            select: {
+                link: true
+            }
+        });
+
+        if(resourceExists === null) {
+            return returnResponse(res, 404, "Recurso no encontrado");
+        }
+
+        const uploadsDir = path.join(__dirname, "../..");
+        const file = path.join(uploadsDir, resourceExists.link);
+
+        if (!fs.existsSync(file)) {
+            return returnResponse(res, 404, "El archivo no existe en el servidor");
+        }
+
+        res.download(file, (err) => {
+            if (err) {
+                return returnResponse(res, 500, "Error al descargar el archivo");
+            }
+        });
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     getCourseDetails,
     getModules,
     getClasses,
     addClassCompleted,
-    getResponse
+    getResponse,
+    getResource
 }
