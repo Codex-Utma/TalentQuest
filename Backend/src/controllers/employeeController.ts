@@ -188,7 +188,7 @@ const addClassCompleted = async (req: Request, res: Response) => {
         });
 
         if(classCompleted !== null) {
-            return returnResponse(res, 400, "La clase ya ha sido completada");
+            return returnResponse(res, 200, "Clase ya completada");
         }
 
         await prisma.classAdvance.create({
