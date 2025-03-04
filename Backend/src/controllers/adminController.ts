@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 
 import { PrismaClient } from "@prisma/client";
 import returnResponse from "../utils/auto/response";
+import fileUpload from "express-fileupload";
 
 const prisma = new PrismaClient();
 
@@ -364,6 +365,97 @@ const getClasses = async (req: Request, res: Response) => {
     }
 }
 
+const addResource = async (req: Request, res: Response) => {
+    try {
+        if (req.files === null || req.files === undefined) {
+            return returnResponse(res, 400, "No se encontraron archivos");
+        }
+
+        const file = req.files.resource as fileUpload.UploadedFile;
+
+        const fileType = file.name.split('.').pop();
+
+        const validFileType = await prisma.resourceType.findFirst({
+            where: {
+                description: fileType
+            },
+            select: {
+                id: true
+            }
+        });
+
+        if (validFileType === null) {
+            return returnResponse(res, 400, "Tipo de archivo no permitido");
+        }
+
+        const fileName = file.name;
+
+        if (!file) {
+            return returnResponse(res, 400, "El archivo es obligatorio");
+        }
+
+        const { classId, moduleId, courseId } = req.params;
+
+        if (!classId || !moduleId || !courseId) {
+            return returnResponse(res, 400, "Todos los campos son obligatorios");
+        }
+
+        const module = await prisma.module.findFirst({
+            where: {
+                id: Number(moduleId)
+            },
+            select: {
+                id: true
+            }
+        });
+
+        if (module === null) {
+            return returnResponse(res, 404, "El módulo no existe");
+        }
+
+        const course = await prisma.course.findFirst({
+            where: {
+                id: Number(courseId)
+            },
+            select: {
+                id: true
+            }
+        });
+
+        if (course === null) {
+            return returnResponse(res, 404, "El curso no existe");
+        }
+
+        const classExist = await prisma.class.findFirst({
+            where: {
+                id: Number(classId)
+            },
+            select: {
+                id: true
+            }
+        });
+
+        if (!classExist) {
+            return returnResponse(res, 404, "La clase no existe");
+        }
+
+        await file.mv(__dirname + '/../../uploads/' + courseId + '/' + moduleId + '/' + classId + '/' + fileName);
+
+        await prisma.resource.create({
+            data: {
+                name: fileName,
+                link: './uploads/' + courseId + '/' + moduleId + '/' + classId + '/' + fileName,
+                idClass: Number(classId),
+                idResourceType: validFileType.id
+            }
+        });
+
+        return returnResponse(res, 200, "Recurso agregado correctamente");
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     getUsersStats,
     createCourse,
@@ -373,5 +465,6 @@ export {
     register,
     getCourses,
     getModules,
-    getClasses
+    getClasses,
+    addResource
 }
