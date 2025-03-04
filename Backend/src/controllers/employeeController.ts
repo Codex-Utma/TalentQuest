@@ -66,6 +66,21 @@ const getModules = async (req: Request, res: Response) => {
             return returnResponse(res, 400, "El id del curso debe ser un número");
         }
 
+        const course = await prisma.course.findFirst({
+            where: {
+                id: courseId
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true
+            }
+        });
+
+        if(course === null) {
+            return returnResponse(res, 404, "Curso no encontrado");
+        }
+
         const modules = await prisma.module.findMany({
             where: {
                 idCourse: courseId
@@ -81,7 +96,16 @@ const getModules = async (req: Request, res: Response) => {
             return returnResponse(res, 404, "No se encontraron módulos para el curso");
         }
 
-        return returnResponse(res, 200, "Módulos encontrados", modules);
+        const response = {
+            course: {
+                id: course.id,
+                name: course.name,
+                description: course.description
+            },
+            modules
+        }
+
+        return returnResponse(res, 200, "Módulos encontrados", response);
     } catch {
         return returnResponse(res, 500, "Error interno del servidor");
     }
@@ -93,6 +117,21 @@ const getClasses = async (req: Request, res: Response) => {
 
         if(isNaN(moduleId)) {
             return returnResponse(res, 400, "El id del módulo debe ser un número");
+        }
+
+        const module = await prisma.module.findFirst({
+            where: {
+                id: moduleId
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true
+            }
+        });
+
+        if(module === null) {
+            return returnResponse(res, 404, "Módulo no encontrado");
         }
 
         const classes = await prisma.class.findMany({
@@ -110,7 +149,16 @@ const getClasses = async (req: Request, res: Response) => {
             return returnResponse(res, 404, "No se encontraron clases para el módulo");
         }
 
-        return returnResponse(res, 200, "Clases encontradas", classes);
+        const response = {
+            module: {
+                id: module.id,
+                name: module.name,
+                description: module.description
+            },
+            classes
+        }
+
+        return returnResponse(res, 200, "Clases encontradas", response);
     } catch {
         return returnResponse(res, 500, "Error interno del servidor");
     }
