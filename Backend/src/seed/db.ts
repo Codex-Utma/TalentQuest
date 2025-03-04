@@ -89,11 +89,29 @@ const seedClasses = async () => {
     }
 }
 
+async function seedResourceType() {
+    try {
+        await prisma.resourceType.createMany({
+            data: [
+                { name: "Video", description: "mp4" },
+                { name: "PDF", description: "pdf" },
+                { name: "Audio", description: "mp3" },
+                { name: "Imagen", description: "jpg" },
+                { name: "Imagen", description: "png" },
+                { name: "Imagen", description: "jpeg" }
+            ]
+        });
+    } catch {
+        throw new Error("Error al ejecutar el seed");
+    }
+}
+
 try {
     // seed();
     // seedModules();
     // console.log("Seed ejecutado correctamente");
     // seedClasses();
+    // seedResourceType();
     console.log('No hay seed´s para ejecutar');
 } catch {
     throw new Error("Error al ejecutar el seed");
