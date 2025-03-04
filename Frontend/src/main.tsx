@@ -6,6 +6,7 @@ import './index.css'
 import App from './App.tsx'
 import Prueba from './pages/prueba.tsx'
 
+
 import AdminLayout from './layout/AdminLayout.tsx'
 import EmployeeLayout from './layout/EmployeeLayout.tsx'
 
