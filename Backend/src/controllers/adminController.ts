@@ -258,6 +258,112 @@ const getCourses = async (req: Request, res: Response) => {
     }
 }
 
+const getModules = async (req: Request, res: Response) => {
+    try {
+        const courseId = Number(req.params.courseId);
+
+        if (isNaN(courseId)) {
+            return returnResponse(res, 400, "El id del curso debe ser un número");
+        }
+
+        const course = await prisma.course.findFirst({
+            where: {
+                id: courseId
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true
+            }
+        });
+
+        if (course === null) {
+            return returnResponse(res, 404, "Curso no encontrado");
+        }
+
+        const modules = await prisma.module.findMany({
+            where: {
+                idCourse: courseId
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true
+            }
+        });
+
+        if (modules.length === 0) {
+            return returnResponse(res, 404, "No se encontraron módulos para el curso");
+        }
+
+        const response = {
+            course: {
+                id: course.id,
+                name: course.name,
+                description: course.description
+            },
+            modules
+        }
+
+        return returnResponse(res, 200, "Módulos encontrados", response);
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
+const getClasses = async (req: Request, res: Response) => {
+    try {
+        const moduleId = Number(req.params.moduleId);
+
+        if (isNaN(moduleId)) {
+            return returnResponse(res, 400, "El id del módulo debe ser un número");
+        }
+
+        const module = await prisma.module.findFirst({
+            where: {
+                id: moduleId
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true
+            }
+        });
+
+        if (module === null) {
+            return returnResponse(res, 404, "Módulo no encontrado");
+        }
+
+        const classes = await prisma.class.findMany({
+            where: {
+                idModule: moduleId
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true
+            }
+        });
+
+        if (classes.length === 0) {
+            return returnResponse(res, 404, "No se encontraron clases para el módulo");
+        }
+
+        const response = {
+            module: {
+                id: module.id,
+                name: module.name,
+                description: module.description
+            },
+            classes
+        }
+
+        return returnResponse(res, 200, "Clases encontradas", response);
+    } catch {
+        return returnResponse(res, 500, "Error interno del servidor");
+    }
+}
+
 export {
     getUsersStats,
     createCourse,
@@ -265,5 +371,7 @@ export {
     createClass,
     getGeneralStats,
     register,
-    getCourses
+    getCourses,
+    getModules,
+    getClasses
 }
