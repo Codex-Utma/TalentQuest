@@ -41,7 +41,7 @@ model User {
 model Resource {
   id Int @id @default(autoincrement())
   name String @db.VarChar(32)
-  description String @db.VarChar(128)
+  description String? @db.VarChar(128)
   link String @db.VarChar(255)
   class Class @relation(fields: [idClass], references: [id])
   idClass Int
