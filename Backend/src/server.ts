@@ -6,6 +6,8 @@ import AdminRouter from "./routes/admin.routes";
 import EmployeeRouter from "./routes/employee.routes";
 import UserRouter from './routes/user.routes';
 
+import fileupload from 'express-fileupload';
+
 const server = express();
 
 dotenv.config();
@@ -13,6 +15,10 @@ dotenv.config();
 server.use(express.json());
 
 server.use(cors());
+
+server.use(fileupload({
+  createParentPath: true
+}));
 
 const PORT = process.env.PORT || 4000;
 
