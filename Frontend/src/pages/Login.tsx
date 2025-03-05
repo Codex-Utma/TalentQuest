@@ -25,7 +25,7 @@ const Login = () => {
     if (user?.userType === "employee") {
       navigate("/employee");
     }
-  })
+  }, [user, navigate]);
 
   const { register, handleSubmit } = useForm<LoginType>({
     resolver: zodResolver(loginSchema),
@@ -33,10 +33,7 @@ const Login = () => {
 
   const onSuccess = async (data: LoginType) => {
     try {
-      const response = await AxiosInstance.post("/user/login", {
-        email: data.email,
-        password: data.password,
-      });
+      const response = await AxiosInstance.post("/user/login", data);
 
       const token = response.data.data;
 
