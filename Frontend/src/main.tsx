@@ -16,7 +16,6 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <Routes>
 
-
         <Route path="/admin" element={<AdminLayout />} >
           <Route path="Adduser" element={<Adduser />} />
           <Route path="Curse" element={<Curse />} />
