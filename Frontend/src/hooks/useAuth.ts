@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { jwtDecode } from 'jwt-decode';
 
 type Role = 'admin' | 'employee';
 
@@ -17,7 +16,7 @@ type AuthState = {
     isAuth: boolean;
     user: User | null;
     loading: boolean;
-    login: (jwt: string) => void;
+    login: (user: User) => void;
     logout: () => void;
 };
 
@@ -27,14 +26,13 @@ const useAuth = create<AuthState>()(
             isAuth: false,
             user: null,
             loading: true,
-            login: (jwt: string) => {
+            login: (user: User) => {
                 try {
-                    const decoded = jwtDecode<User>(jwt);
-                    if (decoded.exp * 1000 < Date.now()) {
+                    if (user.exp * 1000 < Date.now()) {
                         alert('El token ha expirado');
                         return;
                     }
-                    set({ isAuth: true, user: decoded, loading: false });
+                    set({ isAuth: true, user: user, loading: false });
                 } catch (error) {
                     console.error('Error al decodificar el JWT:', error);
                     set({ isAuth: false, user: null, loading: false });
