@@ -12,6 +12,7 @@ import Newmodule from './pages/Admin/Newmodule.tsx'
 import Curse from './pages/Admin/Curse.tsx'
 import Class from './pages/Admin/class.tsx'
 import Resource from './pages/Admin/Resource.tsx'
+import AdministratorPage from './pages/Admin/administrator.tsx'
 
 createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')!).render(
         <Route index element={<Login />} />
 
         <Route path="/admin" element={<AdminLayout />} >
+          <Route index element={<AdministratorPage />} />
           <Route path="Adduser" element={<Adduser />} />
           <Route path="Curse" element={<Curse />} />
           <Route path="Newmodule" element={<Newmodule />} />

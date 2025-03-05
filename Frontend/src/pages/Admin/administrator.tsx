@@ -282,10 +282,9 @@ const AdministratorPage: React.FC = () => {
                     </div>
                 </div>
                 </div>
-    
+
             </div>
         );
     };
-    
+
     export default AdministratorPage
-    
