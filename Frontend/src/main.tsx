@@ -7,7 +7,10 @@ import './index.css'
 import AdminLayout from './layout/AdminLayout.tsx'
 import EmployeeLayout from './layout/EmployeeLayout.tsx'
 import Adduser from './pages/Adduser.tsx'
-import Panel from './pages/Panel.tsx'
+import Newmodule from './pages/Newmodule.tsx'
+import Curse from './pages/Curse.tsx'
+import Class from './pages/class.tsx'
+import Resource from './pages/Resource.tsx'
 
 createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
@@ -16,7 +19,10 @@ createRoot(document.getElementById('root')!).render(
 
         <Route path="/admin" element={<AdminLayout />} >
           <Route path="Adduser" element={<Adduser />} />
-          <Route path="Panel" element={<Panel />} />
+          <Route path="Curse" element={<Curse />} />
+          <Route path="Newmodule" element={<Newmodule />} />
+          <Route path="Class" element={<Class />} />
+          <Route path="Resource" element={<Resource />} />
         </Route>
 
         <Route path="/employee" element={<EmployeeLayout />} >
