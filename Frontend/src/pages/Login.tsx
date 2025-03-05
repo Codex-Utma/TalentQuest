@@ -35,9 +35,9 @@ const Login = () => {
     try {
       const response = await AxiosInstance.post("/user/login", data);
 
-      const token = response.data.data;
+      const user = response.data.data;
 
-      login(token);
+      login(user);
     } catch (error: any) {
       alert(error.response.data.message);
     }
