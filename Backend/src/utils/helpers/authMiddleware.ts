@@ -7,8 +7,7 @@ const prisma = new PrismaClient();
 
 const authMiddleware = (userType: 'admin' | 'employee') => async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-
-        const token = req.header('Authorization')?.replace('Bearer ', '');
+        const token = req.cookies['auth-token'];
 
         if (!token) {
             res.status(401).json({ message: 'No provided token' });
