@@ -1,11 +1,31 @@
 
 import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { loginSchema } from "../schemas/login.schema";
 import { LoginType } from "../types/Login";
+
 import { AxiosInstance } from "../config/axios";
 
+import useAuth from "../hooks/useAuth";
+
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+
 const Login = () => {
+
+  const navigate = useNavigate();
+
+  const { login, user } = useAuth();
+
+  useEffect(() => {
+    if (user?.userType === "admin") {
+      navigate("/admin");
+    }
+    if (user?.userType === "employee") {
+      navigate("/employee");
+    }
+  })
 
   const { register, handleSubmit } = useForm<LoginType>({
     resolver: zodResolver(loginSchema),
@@ -20,7 +40,7 @@ const Login = () => {
 
       const token = response.data.data;
 
-      console.log(token);
+      login(token);
     } catch (error: any) {
       alert(error.response.data.message);
     }
