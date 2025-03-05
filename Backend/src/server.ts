@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
 import AdminRouter from "./routes/admin.routes";
 import EmployeeRouter from "./routes/employee.routes";
@@ -12,9 +13,17 @@ const server = express();
 
 dotenv.config();
 
+server.use(cookieParser());
+
 server.use(express.json());
 
-server.use(cors());
+server.use(cors({
+  origin: (origin, callback) => {
+    callback(null, true);
+  },
+  credentials: true
+}));
+
 
 server.use(fileupload({
   createParentPath: true
